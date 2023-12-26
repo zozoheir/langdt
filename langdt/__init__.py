@@ -3,25 +3,18 @@ from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 import re
 
-# Testing the function with the provided examples
-test_cases = [
-    "all", "recent", "yesterday", "since last month", "this week",
-    "last 20 minutes", "last year", "last 2 years", "last month", "last 5 weeks", "last hour",
-    "from 2022-10-10 to 2025-10-10T00:30:11",
-    "from 2022 to 2025",
-    "from Nov 2nd 2023 to Nov 5th 2025"
-]
-
 # Testing the updated function with the provided examples
-def get_timeframe(filter_str):
+def get_timeframe(filter_str='None'):
+    if filter_str is None:
+        return None, None
     now = datetime.now()
     lower_str = filter_str.lower()
 
     if lower_str in ["all", "all time"]:
         return None, None
 
-    if lower_str == "recent":
-        return (now - timedelta(days=7)).isoformat(), now.isoformat()
+    if lower_str in ["recent", "latest"]:
+        return (now - timedelta(days=30)).isoformat(), now.isoformat()
 
     if lower_str == "yesterday":
         yesterday = now - timedelta(days=1)
@@ -98,10 +91,34 @@ def get_timeframe(filter_str):
 
             return from_date.isoformat(), to_date.isoformat()
 
+
+    # Pattern: Number followed by a letter (d, min, m, y) for time unit
+    number_letter_pattern = re.match(r"(\d+)([a-zA-Z]+)", lower_str)
+    if number_letter_pattern:
+        time_value, time_unit = number_letter_pattern.groups()
+        time_value = int(time_value)
+
+        if time_unit in ['d', 'D']:
+            delta = timedelta(days=time_value)
+        elif time_unit in ['w', 'W']:
+            delta = timedelta(weeks=time_value)
+        elif time_unit in ['h', 'H']:
+            delta = timedelta(hours=time_value)
+        elif time_unit in ['min']:
+            delta = timedelta(minutes=time_value)
+        elif time_unit in ['m', 'M']:
+            delta = relativedelta(months=time_value)
+        elif time_unit in ['y', 'Y']:
+            delta = relativedelta(years=time_value)
+        else:
+            return "Unrecognized", None
+
+        from_time = now - delta
+        return from_time.isoformat(), now.isoformat()
+
+
+
     # Default case for unrecognized patterns
     return "Unrecognized", None
 
-# Testing the updated function with the provided examples
-for case in test_cases:
-    from_, to = get_timeframe(case)
-    print(f"{case}: {from_} - {to}")
+
