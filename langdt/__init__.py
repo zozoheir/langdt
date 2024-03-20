@@ -41,6 +41,7 @@ def get_timeframe(filter_str='None'):
     # Handle "since" pattern
     if lower_str.startswith("since "):
         time_reference = lower_str.split(" ")[1]
+
         if time_reference == "yesterday":
             since_time = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         elif time_reference == "last":
@@ -50,7 +51,10 @@ def get_timeframe(filter_str='None'):
                                                                                     microsecond=0)
             elif time_unit == "year":
                 since_time = (now.replace(day=1, month=1) - relativedelta(years=1)).replace(hour=0, minute=0, second=0,
-                                                                                            microsecond=0)
+                                                                                    microsecond=0)
+        else:
+            since_time = parse(time_reference)
+
         return since_time.isoformat(), now.isoformat()
 
     # Handle "this" pattern
@@ -115,7 +119,6 @@ def get_timeframe(filter_str='None'):
 
         from_time = now - delta
         return from_time.isoformat(), now.isoformat()
-
 
 
     # Default case for unrecognized patterns

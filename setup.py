@@ -5,6 +5,6 @@ setup(name='langdt',
       description='Timestamps from natural language',
       packages=find_packages(),
       author='Othmane Zoheir',
-      author_email='zozoheir@umich.edu',
+      author_email='othmane@rumorz.io',
       url='',
      )
