@@ -1,13 +1,16 @@
 from datetime import datetime, timedelta
+from typing import Callable
+
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 import re
 
 # Testing the updated function with the provided examples
-def get_timeframe(filter_str='None'):
+def get_timeframe(filter_str='None',
+                  now: Callable[[], datetime] = datetime.utcnow):
     if filter_str is None:
         return None, None
-    now = datetime.now()
+    now = now()
     lower_str = filter_str.lower()
 
     if lower_str in ["all", "all time"]:
